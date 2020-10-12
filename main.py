@@ -176,14 +176,14 @@ def extract_all_zips_into_working_directory(counter, wd_path):
     return num_lines, counter
 
 
-def read_csv_files_in_cwd():
+def read_csv_files_in_cwd(file_counter, num_lines):
+    csv_files_in_work_directory = glob.glob("*.csv")
     plural = plurality(file_counter, "", "s")
     isare = plurality(file_counter, "is", "are")
     line_plurality = plurality(num_lines, "", "s", 1)
     logger.info(
         f"{file_counter-1} csv file{plural} {isare} about to be processed with total {num_lines} line{line_plurality}"
     )
-    csv_files_in_work_directory = glob.glob("*.csv")
     files = "\t".join(csv_files_in_work_directory)
     logger.debug(f"Reading: {files}")
     combined_lines = []
@@ -221,7 +221,7 @@ def pull_extract_files():
     return num_lines, file_counter
 
 
-if __name__ == "__main__":
+def main():
     num_lines, file_counter = pull_extract_files()
     num_lines -= file_counter - 1
 
@@ -234,7 +234,9 @@ if __name__ == "__main__":
     domain_validity = {}
     # A list of lines that failed to be processed and need a human to process them
     failed_list = []
-    combined_lines_from_input_files = read_csv_files_in_cwd()
+    combined_lines_from_input_files = read_csv_files_in_cwd(
+        file_counter, num_lines
+    )
     logger.success("Read in all files")
 
     logger.debug("Starting to process all ingested data")
@@ -260,3 +262,7 @@ if __name__ == "__main__":
         email_output_file.write(f"{email_string}\n")
     logger.success("Wrote emails out")
     email_output_file.close()
+
+
+if __name__ == "__main__":
+    main()
