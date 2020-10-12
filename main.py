@@ -24,6 +24,8 @@ import re
 import multiprocessing
 
 MAX_THREADS = 8
+OUTPUT_FILENAME = "output.txt"
+OUTPUT_FILEPATH = None
 NUM_THREADS = lambda num_tasks: min(MAX_THREADS, num_tasks)
 NUM_TASKS_PER_THREAD = lambda num_tasks: num_tasks / NUM_THREADS(num_tasks)
 plurality = (
@@ -198,8 +200,10 @@ def read_csv_files_in_cwd(file_counter, num_lines):
 
 
 def pull_extract_files():
+    global OUTPUT_FILENAME, OUTPUT_FILEPATH
     # Get the path of the file being run without the file at the end of the path (get containing folder)\
     cwd = os.path.dirname(os.path.realpath(__file__))
+    OUTPUT_FILEPATH = os.path.join(cwd, OUTPUT_FILENAME)
     os.chdir(cwd)
     work_dir = "/".join([cwd, "PMARINA_Email_Aggregator"])
 
@@ -257,7 +261,7 @@ def main():
     logger.debug("Starting dump from set to output.txt")
     overall_email_list = list(overall_email_set)
     overall_email_list = sorted(overall_email_list)
-    email_output_file = open("output.txt", "w")
+    email_output_file = open(OUTPUT_FILEPATH, "w")
     for email_string in tqdm(overall_email_list):
         email_output_file.write(f"{email_string}\n")
     logger.success("Wrote emails out")

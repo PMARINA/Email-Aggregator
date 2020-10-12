@@ -7,9 +7,13 @@ class event:
         self.sign_up_url = sign_up_url
         self.occurrences = occurrences
 
-    def get_date_time_strings(self):
+    def get_date_time_strings(self, occurrences=None):
+        if not occurrences:
+            occurrences = self.occurrences
+        if type(occurrences) != list:
+            occurrences = [occurrences]
         return_list = []
-        for occ in self.occurrences:
+        for occ in occurrences:
             return_list.append(
                 occ.strftime("%A, %B %-d (%m/%d/%Y) at %-I:%M %p")
             )
