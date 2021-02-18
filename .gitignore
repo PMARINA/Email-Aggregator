@@ -4,3 +4,4 @@
 !main.py
 !README.md
 !*.py
+!.pre-commit-config.yaml

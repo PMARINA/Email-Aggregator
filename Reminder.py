@@ -1,42 +1,64 @@
-from Event import event
+from typing import List
+from Event import Event
+from loguru import logger
+import Mail
 
 
-def get_email(event, occ):
-    body = """
-    <div dir="ltr">
-        <div class="gmail_quote">
-            <div dir="ltr">
-                <div class="gmail_quote">
-                    <div dir="ltr">
-                        <div style="text-align:center"><img src="https://i.postimg.cc/sx8hCztQ/big-logo.png" alt="CTC Logo"
-                                width="398" height="143"><br>
-                        </div>
-                        <div style="text-align:center"><b>Hi Everyone!</b></div>
-                        <div style="text-align:center"><br></div>
-"""
-    body += f"""
-                        <div style="text-align:center">This is a reminder that {event.name} will happening today, {event.get_date_time_strings([occ])[0]} at the following Zoom link.
-                        </div>
-                        <div style="text-align:center"><a
-                                href="https://stevens.zoom.us/s/91570444680">https://stevens.zoom.us/s/<wbr>91570444680</a>
-                        </div>
-                    </div>
-                    <div style="text-align:center">Hope to see you there!</div>
-                </div>
-            </div>
-        </div>
-    </div>
-    </div>
-"""
-    return body
+class Reminder:
+    event_list = None
 
+    def __init__(self, event_list: List[Event]):
+        self.events = event_list
+        self.html = None
+        self.subject = None
+        self.recipients = None
 
-def write_email(event, occ):
-    body = get_email(event, occ)
-    with open("Output.html", "w") as output:
-        output.write(body)
-    return body
+    @staticmethod
+    def read_inputs():
+        lines = None
+        with open(INPUT_FILE) as infile:
+            lines = infile.readlines()
+        if not lines:
+            logger.error(f"{INPUT_FILE} not found. exiting")
+            exit(1)
+        else:
+            events = []
+            lines_cleaned = []
+            for line in lines:
+                if not line.startswith(COMMENT_CHARACTER):
+                    lines_cleaned.append(line.strip())
+            i = 0
+            while i < (len(lines_cleaned)):
+                event_name = lines_cleaned[i]
+                i += 1
+                event_description = lines_cleaned[i]
+                i += 1
+                event_url = lines_cleaned[i]
+                i += 1
+                occurrences = []
+                while i < len(lines_cleaned) and lines_cleaned[i] != "":
+                    occurrences.append(datetime.strptime(lines_cleaned[i].strip(), "%Y.%m.%d %H%M"))
+                    i += 1
+                i += 1
+                events.append(Event(event_name, event_description, event_url, occurrences))
+            return events
 
+    def create_html(self):
+        logger.critical(
+            "create_html is not implemented. Reminder.py is a base class and not intended to be functional"
+        )
+        raise NotImplementedError()
 
-# if __name__ == "__main__":
-#     write_email(None, None)
+    def create_draft(self):
+        if not self.html:
+            raise RuntimeError("html is not yet created. Please run create_html() first.")
+        if not self.subject:
+            raise RuntimeError("You are likely calling this method on the abstract base class")
+        Mail.create_draft(self.subject, self.html, bcc_to=self.recipients)
+
+    def send_email(self):
+        if not self.html:
+            raise RuntimeError("html is not yet created. Please run create_html() first.")
+        if not self.subject:
+            raise RuntimeError("You are likely calling this method on the abstract base class")
+        Mail.send_message(self.subject, self.html, bcc_to=self.recipients)

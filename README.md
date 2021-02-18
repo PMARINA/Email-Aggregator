@@ -27,4 +27,3 @@
   - If the script cannot extract a line, it will wait until it extracts everything and then ask you for the correct email from each line.
   - If you ctrl+c at this point, you won't have any emails extracted... You can just comment out the lines between `logger.debug("about to process failed lines")` and the `logger.success...` right after it.
 - [PMARINA_Email_Aggregator/output.txt](PMARINA_Email_Aggregator/output.txt) will have your emails, separated by newlines.
-

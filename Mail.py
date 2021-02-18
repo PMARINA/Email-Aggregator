@@ -1,11 +1,12 @@
-from __future__ import print_function
 import pickle
 from email.mime.text import MIMEText
 import base64
-import os.path
+from os.path import exists as file_exists
 from googleapiclient.discovery import build
 from google_auth_oauthlib.flow import InstalledAppFlow
 from google.auth.transport.requests import Request
+from Variables import FROM, BCC_TO, TO, G_CLOUD_SECRETS_FILE
+from typing import List
 
 
 # If modifying these scopes, delete the file token.pickle.
@@ -15,61 +16,46 @@ SCOPES = [
 ]
 
 
-def create_message(sender, to, subject, message_text):
-    message = MIMEText(message_text, "html")
-    if type(to) is str:
-        message["bcc"] = to
+def create_message(subject, html, sender, bcc_to, to):
+    message = MIMEText(html, "html")
+    if type(bcc_to) is str:
+        message["bcc"] = bcc_to
+    elif hasattr(to, "__iter__"):
+        message["bcc"] = "; ".join(bcc_to)
     else:
-        message["bcc"] = ";".join(to)
+        pass
+
+    if type(to) is str:
+        message["to"] = to
+    elif hasattr(to, "__iter__"):
+        message["to"] = "; ".join(to)
+    else:
+        pass
+
     message["from"] = sender
     message["subject"] = subject
+
     raw_message = base64.urlsafe_b64encode(message.as_string().encode("utf-8"))
     return {"raw": raw_message.decode("utf-8")}
 
 
-def create_draft(service, user_id, message_body):
-    try:
-        message = {"message": message_body}
-        draft = service.users().drafts().create(userId=user_id, body=message).execute()
-
-        print("Draft id: %s\nDraft message: %s" % (draft["id"], draft["message"]))
-
-        return draft
-    except Exception as e:
-        print("An error occurred: %s" % e)
-        return None
+def create_draft(subject, html, sender=FROM, bcc_to=BCC_TO, to=TO, user_id="me"):
+    message = {"message": create_message(subject, html, sender, bcc_to, to)}
+    draft = get_service().users().drafts().create(userId=user_id, body=message).execute()
 
 
-def send_message(service, user_id, message):
-    """Send an email message.
-
-    Args:
-        service: Authorized Gmail API service instance.
-        user_id: User's email address. The special value "me"
-        can be used to indicate the authenticated user.
-        message: Message to be sent.
-
-    Returns:
-        Sent Message.
-    """
-    try:
-        message = (
-            service.users().messages().send(userId=user_id, body=message).execute()
-        )
-        # print 'Message Id: %s' % message['id']
-        return message
-    except Exception as e:
-        print(e)
-        print("Failed")
-        # print 'An error occurred: %s' % error
+def send_message(subject, html, sender=FROM, bcc_to=BCC_TO, to=TO, user_id="me"):
+    get_service().users().messages().send(
+        userId=user_id, body=create_message(subject, html, sender, bcc_to, to)
+    ).execute()
 
 
-def refresh_import_credentials():
+def get_service():
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
     # time.
-    if os.path.exists("token.pickle"):
+    if file_exists("token.pickle"):
         with open("token.pickle", "rb") as token:
             creds = pickle.load(token)
     # If there are no (valid) credentials available, let the user log in.
@@ -77,7 +63,7 @@ def refresh_import_credentials():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file("credentials.json", SCOPES)
+            flow = InstalledAppFlow.from_client_secrets_file(G_CLOUD_SECRETS_FILE, SCOPES)
             creds = flow.run_local_server(port=0)
         # Save the credentials for the next run
         with open("token.pickle", "wb") as token:
