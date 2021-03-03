@@ -1,4 +1,5 @@
 from typing import List
+from typing import Optional
 from Event import Event
 from loguru import logger
 import Mail
@@ -9,9 +10,9 @@ class Reminder:
 
     def __init__(self, event_list: List[Event]):
         self.events = event_list
-        self.html = None
-        self.subject = None
-        self.recipients = None
+        self.html = ""
+        self.subject = ""
+        self.recipients = ""
 
     @staticmethod
     def read_inputs():

@@ -13,7 +13,9 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
 import re
 import EmailParser
+import glob
 import zipfile
+import shutil
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
@@ -59,6 +61,10 @@ def get_recipients(url):
     for file in response.get("files", []):
         if file.get("name") == form_name:
             form_id = file.get("id")
+    if not form_id:
+        raise RuntimeError(
+            "Form ID not found given name... is the form in the drive and shared with this account?"
+        )
     # We have form id
     fh = io.BytesIO()
     request = svc.files().export_media(fileId=form_id, mimeType="application/zip")
@@ -68,6 +74,7 @@ def get_recipients(url):
         status, done = downloader.next_chunk()
     zipname = "form.zip"
     csvname = "form.csv"
+    workdir = "temp"
     with open(zipname, "wb") as f:
         f.write(fh.getbuffer())
     with zipfile.ZipFile(zipname, "r") as zipobj:
@@ -76,14 +83,21 @@ def get_recipients(url):
             # If any file in the zip (whether it's in another folder, doesn't
             # matter), ends in csv, pull it
             if filename_from_zip.endswith(".csv"):
-                zipobj.extract(filename_from_zip)
-                rename(filename_from_zip, csvname)
-    emails = EmailParser.extract_emails(csvname)
-    for d in [zipname, csvname, "geckodriver.log"]:
+                zipobj.extract(filename_from_zip, workdir)
+    fname = glob.glob(f"{workdir}/*.csv")[0]
+    rename(fname, f"{workdir}/{csvname}")
+    emails = EmailParser.extract_emails(f"{workdir}/{csvname}")
+    for d in [zipname, "geckodriver.log"]:
         try:
             remove(d)
         except Exception:
-            pass
+            print("Failed to remove file: " + str(d))
+    for d in [workdir]:
+        try:
+            shutil.rmtree(d)
+        except:
+            print("Failed to remove folder: " + str(d))
+
     return emails
 
 

@@ -148,13 +148,15 @@ class Event:
                 cleaned_line: str = line.strip()
 
                 if last_line_empty and is_empty_str(cleaned_line):
+                    # last_line_empty = True # This is implicit since it's already true...
+                    continue
+                elif comment_character != "" and cleaned_line.startswith(comment_character):
+                    last_line_empty = True
                     continue
                 elif is_empty_str(cleaned_line):
                     last_line_empty = True
                 else:
                     last_line_empty = False
-
-                if comment_character != "" and not cleaned_line.startswith(comment_character):
                     output_lines.append(cleaned_line)
 
             if is_empty_str(output_lines[-1]):
