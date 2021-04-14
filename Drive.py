@@ -1,22 +1,24 @@
-import pickle
-from os.path import exists
-from os import rename, remove
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
+import glob
 import io
+import pickle
+import re
+import shutil
+import zipfile
+from os import remove, rename
+from os.path import exists
+
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
 from googleapiclient.http import MediaIoBaseDownload
+from loguru import logger
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.firefox.options import Options as FirefoxOptions
-import re
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+
 import EmailParser
-import glob
-import zipfile
-import shutil
-from loguru import logger
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [

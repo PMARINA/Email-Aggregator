@@ -1,22 +1,23 @@
-from loguru import logger
-from Reminder import Reminder
 import inflect
+from loguru import logger
+
 import Event
+from Reminder import Reminder
 from Variables import (
-    ZOOM_LINK,
-    ZOOM_LINK_TEXT,
-    HOME_PAGE_LINK,
-    HOME_PAGE_LINK_TEXT,
+    BIG_LOGO_URL,
+    CTC_INSTA_HANDLE_URL,
     EVENTS_PAGE_LINK,
     EVENTS_PAGE_LINK_TEXT,
+    HOME_PAGE_LINK,
+    HOME_PAGE_LINK_TEXT,
+    INSTA_ATSIGN_URL,
     SLACK_LINK,
     SLACK_LINK_TEXT,
-    BIG_LOGO_URL,
     SMALL_LOGO_URL,
-    INSTA_ATSIGN_URL,
-    CTC_INSTA_HANDLE_URL,
-    WEEKLY_SUBJECT,
     WEEKLY_RECIPIENTS,
+    WEEKLY_SUBJECT,
+    ZOOM_LINK,
+    ZOOM_LINK_TEXT,
 )
 
 p = inflect.engine()

@@ -1,8 +1,9 @@
-from typing import List
-from typing import Optional
-from Event import Event
+from typing import List, Optional
+
 from loguru import logger
+
 import Mail
+from Event import Event
 
 
 class Reminder:

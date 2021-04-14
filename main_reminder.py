@@ -1,6 +1,7 @@
-from Event_Reminder import Event_Reminder
-from Event import Event
 from typing import List
+
+from Event import Event
+from Event_Reminder import Event_Reminder
 
 events: List[Event] = Event.import_events()
 wk = Event_Reminder(events)

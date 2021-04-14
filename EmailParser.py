@@ -1,14 +1,15 @@
 import glob
 import os
-from loguru import logger
-from tqdm import tqdm
+import re
+import shutil
+import zipfile
+
+import dns
 
 # https://stackoverflow.com/a/21642297 for installing pydns...
 from dns.resolver import query
-import dns
-import shutil
-import zipfile
-import re
+from loguru import logger
+from tqdm import tqdm
 
 
 def reject(line: str, failed_list: list):

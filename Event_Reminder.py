@@ -1,22 +1,24 @@
-from loguru import logger
-from Reminder import Reminder
+from typing import List, Union
+
 import inflect
-from Event import Event
-from typing import Union, List
+from loguru import logger
+
 from Drive import get_recipients
+from Event import Event
+from Reminder import Reminder
 from Variables import (
-    ZOOM_LINK,
-    ZOOM_LINK_TEXT,
-    HOME_PAGE_LINK,
-    HOME_PAGE_LINK_TEXT,
+    BIG_LOGO_URL,
+    CTC_INSTA_HANDLE_URL,
     EVENTS_PAGE_LINK,
     EVENTS_PAGE_LINK_TEXT,
+    HOME_PAGE_LINK,
+    HOME_PAGE_LINK_TEXT,
+    INSTA_ATSIGN_URL,
     SLACK_LINK,
     SLACK_LINK_TEXT,
-    BIG_LOGO_URL,
     SMALL_LOGO_URL,
-    INSTA_ATSIGN_URL,
-    CTC_INSTA_HANDLE_URL,
+    ZOOM_LINK,
+    ZOOM_LINK_TEXT,
     get_event_reminder_subject,
 )
 

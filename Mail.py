@@ -1,13 +1,14 @@
+import base64
 import pickle
 from email.mime.text import MIMEText
-import base64
 from os.path import exists as file_exists
-from googleapiclient.discovery import build
-from google_auth_oauthlib.flow import InstalledAppFlow
-from google.auth.transport.requests import Request
-from Variables import FROM, BCC_TO, TO, G_CLOUD_SECRETS_FILE
 from typing import List
 
+from google.auth.transport.requests import Request
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+
+from Variables import BCC_TO, FROM, G_CLOUD_SECRETS_FILE, TO
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [

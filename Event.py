@@ -1,16 +1,17 @@
 from __future__ import annotations
+
 from datetime import datetime
-from os.path import exists as file_exists
 from os.path import abspath
-from typing import List, Optional, Any
+from os.path import exists as file_exists
 
 # Regular Expressions
+from re import IGNORECASE as RE_IGNORECASE
 from re import compile as re_compile
 from re import match as re_match
-from re import IGNORECASE as RE_IGNORECASE
+from typing import Any, List, Optional
 
 from Exceptions import *
-from Variables import DATETIME_INPUT_FORMAT, DATETIME_OUTPUT_FORMAT, COMMENT_CHARACTER, INPUT_FILE
+from Variables import COMMENT_CHARACTER, DATETIME_INPUT_FORMAT, DATETIME_OUTPUT_FORMAT, INPUT_FILE
 
 # Source: https://stackoverflow.com/a/7160778
 url_validator = re_compile(
