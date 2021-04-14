@@ -203,8 +203,9 @@ class Event:
                     events.append(
                         Event(event_name, event_description, event_url, sorted(occurrences))
                     )
-            except Exception:
-                raise InputError("Failed while parsing cleaned lines.")
+            except Exception as e:
+                print("Failed while parsing cleaned lines.")
+                raise e
             return events
 
         lines: List[str] = get_lines(input_file)

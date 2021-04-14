@@ -16,6 +16,7 @@ import EmailParser
 import glob
 import zipfile
 import shutil
+from loguru import logger
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
@@ -35,6 +36,7 @@ def make_safe_filename(s):
 
 
 def get_recipients(url):
+    # logger.debug(f"Attempting to find final url for {url}")
     options = FirefoxOptions()
     options.add_argument("--headless")
     driver = webdriver.Firefox(options=options)
@@ -45,6 +47,7 @@ def get_recipients(url):
         element = WebDriverWait(driver, 10).until(EC.url_contains("docs.google.com/forms/"))
     finally:
         form_name = driver.title
+        # logger.debug(f"Form Name: {form_name}")
         driver.quit()
     # We have the form name...
     svc = get_service()
@@ -87,6 +90,8 @@ def get_recipients(url):
     fname = glob.glob(f"{workdir}/*.csv")[0]
     rename(fname, f"{workdir}/{csvname}")
     emails = EmailParser.extract_emails(f"{workdir}/{csvname}")
+    emails_str = "\n".join(emails)
+    logger.info(f"{len(emails)} emails were extracted:\n{emails_str}")
     for d in [zipname, "geckodriver.log"]:
         try:
             remove(d)
