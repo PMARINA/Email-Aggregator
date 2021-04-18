@@ -156,6 +156,7 @@ class Event:
                     continue
                 elif is_empty_str(cleaned_line):
                     last_line_empty = True
+                    output_lines.append(cleaned_line)
                 else:
                     last_line_empty = False
                     output_lines.append(cleaned_line)
