@@ -3,6 +3,7 @@ from loguru import logger
 
 import Event
 from Reminder import Reminder
+from Mail import create_message
 from Variables import (
     BIG_LOGO_URL,
     CTC_INSTA_HANDLE_URL,
@@ -14,6 +15,7 @@ from Variables import (
     SLACK_LINK,
     SLACK_LINK_TEXT,
     SMALL_LOGO_URL,
+    TO,
     WEEKLY_RECIPIENTS,
     WEEKLY_SUBJECT,
     ZOOM_LINK,
@@ -75,3 +77,27 @@ class Weekly_Reminder(Reminder):
                         </div>
                     """
         self.html = message
+
+    def create_draft(self):
+        if not self.html:
+            raise RuntimeError("html is not yet created. Please run create_html() first.")
+        if not self.subject:
+            raise RuntimeError("You are likely calling this method on the abstract base class")
+        message = {
+            "message": create_message(
+                self.subject, self.html, sender, bcc_to=TO, to=WEEKLY_RECIPIENTS
+            )
+        }
+        draft = get_service().users().drafts().create(userId=user_id, body=message).execute()
+
+    def send_email(self):
+        if not self.html:
+            raise RuntimeError("html is not yet created. Please run create_html() first.")
+        if not self.subject:
+            raise RuntimeError("You are likely calling this method on the abstract base class")
+        message = {
+            "message": create_message(
+                self.subject, self.html, sender, bcc_to=TO, to=WEEKLY_RECIPIENTS
+            )
+        }
+        get_service().users().messages().send(userId=user_id, body=message).execute()

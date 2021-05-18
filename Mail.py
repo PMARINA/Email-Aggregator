@@ -2,11 +2,12 @@ import base64
 import pickle
 from email.mime.text import MIMEText
 from os.path import exists as file_exists
-from typing import List
+from typing import Iterable, List, Union, Dict
 
 from google.auth.transport.requests import Request
 from google_auth_oauthlib.flow import InstalledAppFlow
-from googleapiclient.discovery import build
+from googleapiclient.discovery import build, Resource
+from loguru import logger
 
 from Variables import BCC_TO, FROM, G_CLOUD_SECRETS_FILE, TO
 
@@ -17,7 +18,25 @@ SCOPES = [
 ]
 
 
-def create_message(subject, html, sender, bcc_to, to):
+def create_message(
+    subject: str,
+    html: str,
+    sender: str,
+    bcc_to: Union[str, Iterable] = "",
+    to: Union[str, Iterable] = "",
+) -> Dict[str, str]:
+    """Create a json object representing a message.
+
+    Args:
+        subject (str): The subject of the email
+        html (str): The HTML string representing the body of the email
+        sender (str): From whom is the email being sent?
+        bcc_to (Union[str, Iterable]): The BCC-to field (can be blank, just submit `""`)
+        to (Union[str, Iterable]): The To field (can be blank, just submit `""`)
+
+    Returns:
+        Dict[str, str]: [description]
+    """
     message = MIMEText(html, "html")
     if type(bcc_to) is str:
         message["bcc"] = bcc_to
@@ -36,13 +55,16 @@ def create_message(subject, html, sender, bcc_to, to):
     message["from"] = sender
     message["subject"] = subject
 
-    raw_message = base64.urlsafe_b64encode(message.as_string().encode("utf-8"))
+    if not message["bcc"] and not message["to"]:
+        logger.warning("No BCC or TO recipient specified.")
+
+    raw_message: bytes = base64.urlsafe_b64encode(message.as_string().encode("utf-8"))
     return {"raw": raw_message.decode("utf-8")}
 
 
 def create_draft(subject, html, sender=FROM, bcc_to=BCC_TO, to=TO, user_id="me"):
     message = {"message": create_message(subject, html, sender, bcc_to, to)}
-    draft = get_service().users().drafts().create(userId=user_id, body=message).execute()
+    _ = get_service().users().drafts().create(userId=user_id, body=message).execute()
 
 
 def send_message(subject, html, sender=FROM, bcc_to=BCC_TO, to=TO, user_id="me"):
@@ -51,7 +73,7 @@ def send_message(subject, html, sender=FROM, bcc_to=BCC_TO, to=TO, user_id="me")
     ).execute()
 
 
-def get_service():
+def get_service() -> Resource:
     creds = None
     # The file token.pickle stores the user's access and refresh tokens, and is
     # created automatically when the authorization flow completes for the first
@@ -70,5 +92,5 @@ def get_service():
         with open("token.pickle", "wb") as token:
             pickle.dump(creds, token)
 
-    service = build("gmail", "v1", credentials=creds)
+    service: Resource = build("gmail", "v1", credentials=creds)
     return service
