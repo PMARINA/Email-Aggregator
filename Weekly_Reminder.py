@@ -1,9 +1,10 @@
 import inflect
+
 from loguru import logger
 
 import Event
 from Reminder import Reminder
-from Mail import create_message
+from Mail import create_message, get_service
 from Variables import (
     BIG_LOGO_URL,
     CTC_INSTA_HANDLE_URL,
@@ -20,6 +21,7 @@ from Variables import (
     WEEKLY_SUBJECT,
     ZOOM_LINK,
     ZOOM_LINK_TEXT,
+    FROM,
 )
 
 p = inflect.engine()
@@ -85,10 +87,10 @@ class Weekly_Reminder(Reminder):
             raise RuntimeError("You are likely calling this method on the abstract base class")
         message = {
             "message": create_message(
-                self.subject, self.html, sender, bcc_to=TO, to=WEEKLY_RECIPIENTS
+                self.subject, self.html, sender=FROM, bcc_to=TO, to=WEEKLY_RECIPIENTS
             )
         }
-        draft = get_service().users().drafts().create(userId=user_id, body=message).execute()
+        draft = get_service().users().drafts().create(userId="me", body=message).execute()
 
     def send_email(self):
         if not self.html:
@@ -97,7 +99,7 @@ class Weekly_Reminder(Reminder):
             raise RuntimeError("You are likely calling this method on the abstract base class")
         message = {
             "message": create_message(
-                self.subject, self.html, sender, bcc_to=TO, to=WEEKLY_RECIPIENTS
+                self.subject, self.html, sender=FROM, bcc_to=TO, to=WEEKLY_RECIPIENTS
             )
         }
-        get_service().users().messages().send(userId=user_id, body=message).execute()
+        get_service().users().messages().send(userId="me", body=message).execute()

@@ -13,7 +13,7 @@ from Variables import BCC_TO, FROM, G_CLOUD_SECRETS_FILE, TO
 
 # If modifying these scopes, delete the file token.pickle.
 SCOPES = [
-    "https://www.googleapis.com/auth/drive.metadata.readonly",
+    "https://www.googleapis.com/auth/drive.readonly",
     "https://www.googleapis.com/auth/gmail.compose",
 ]
 
