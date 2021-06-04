@@ -18,12 +18,13 @@
 ## How do I use it
 
 - Get Python 3+
-- `pip install tqdm loguru`
+- `pip install --upgrade tqdm loguru dnspython google-api-python-client google-auth-oauthlib`
   - Do I really need these?
-    - Unless you change my code, yes. Do they do anything important? Not really. I just wanted to learn to use them.
-- Put [main.py](main.py) in a folder (or if you cloned this repository, skip this step)
-- Copy all CSVs, ZIP files containing CSVs into the same folder as [main.py](main.py)
-- Run [main.py](main.py)
-  - If the script cannot extract a line, it will wait until it extracts everything and then ask you for the correct email from each line.
-  - If you ctrl+c at this point, you won't have any emails extracted... You can just comment out the lines between `logger.debug("about to process failed lines")` and the `logger.success...` right after it.
-- [PMARINA_Email_Aggregator/output.txt](PMARINA_Email_Aggregator/output.txt) will have your emails, separated by newlines.
+    - Yes, for email-sending & drive file access, Google APIs are important. TQDM & Loguru are necessary for clean outputs. dnspython helps with email validation.
+- Put all important events in a new file `input.txt` inside the top level of this repository. 
+  - The format is as follows: (note that `#` is used as the comment character, but only if it is the first (non-whitespace) character in the line)
+    1. Title Line
+    2. Description Line
+    3. Event Sign-up link (heavily recommend dynamic URLs)
+    4. Date & Time: (yyyy.mm.dd hhmm) eg "2021.12.31 2359"
+- Run the applicable file (`python main_weekly.py` or `python main_reminder.py`)
